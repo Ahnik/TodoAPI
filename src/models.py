@@ -10,7 +10,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(128), nullable=False, unique=True)
     name = db.Column(db.String(128), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
-    tasks = db.relationship('Tasks', backref='user')
+    tasks = db.relationship('Tasks', backref='users')
     
     def __repr__(self):
         return f'<Name: {self.name}>'
@@ -24,13 +24,13 @@ class Tasks(db.Model):
     
     # The fields of the table 'tasks'
     task_id = db.Column(db.String(128), primary_key=True)
-    uid = db.Column(db.Integer, db.ForeignKey('user.uid'), nullable=False)
+    uid = db.Column(db.Integer, db.ForeignKey('users.uid'), nullable=False)
     id = db.Column(db.Integer, nullable=False)
     title = db.Column(db.String(128), nullable=False, unique=True)
-    desc = db.Column(db.String(512), nullable=False)
+    description = db.Column(db.String(512), nullable=False)
     
     def __repr__(self):
-        return f'ID: {self.id}\nTitle: {self.title}\nDescription: {self.desc}'
+        return f'ID: {self.id}\nTitle: {self.title}\nDescription: {self.description}'
     
     def get_task_id(self):
         return self.task_id

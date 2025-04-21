@@ -34,5 +34,8 @@ def create_app():
     # We will be using a Bcrypt object to hash the user passwords
     bcrypt = Bcrypt(app)
     
+    from routes import register_routes
+    register_routes(app, db, bcrypt)
+    
     migrate = Migrate(app, db)
     return app
