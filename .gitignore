@@ -84,3 +84,6 @@ Thumbs.db
 # Optional: ignore your scripts output or data dirs
 /output/
 data/
+
+# SQL queries
+*.sql
