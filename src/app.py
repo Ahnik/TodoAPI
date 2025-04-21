@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -29,7 +29,7 @@ def create_app():
     
     @login_manager.unauthorized_handler
     def unauthorized_callback():
-        return redirect(url_for('index'))
+        return jsonify({'message':'Unauthorized'}), 401
     
     # We will be using a Bcrypt object to hash the user passwords
     bcrypt = Bcrypt(app)

@@ -19,7 +19,7 @@ class User(db.Model, UserMixin):
         return self.uid
     
 # The table schema for storing the tasks
-class Tasks(db.Model):
+class Task(db.Model):
     __tablename__ = 'tasks'
     
     # The fields of the table 'tasks'
