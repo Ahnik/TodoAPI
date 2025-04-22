@@ -87,3 +87,6 @@ data/
 
 # SQL queries
 *.sql
+
+# Database instance
+instance

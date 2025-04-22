@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager
+from secrets import token_hex
 
 # Setting up the database
 db = SQLAlchemy()
@@ -10,10 +12,14 @@ db = SQLAlchemy()
 # Creating the function to create our Flask app
 def create_app():
     '''This function creates the Flask application and returns it as a Python object'''
-    app = Flask(__name__, template_folder='templates')
+    app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./test.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.secret_key = 'S*&f,,>A4h/3w2~5DMnUBr+{!~<$k{jT8Lj3~45]sGI<tcsf<96A]Ko,g1WxU/.'
+    app.secret_key = token_hex()
+    
+    # Setup the Flask-JWT-Extended extension
+    app.config['JWT_SECRET_KEY'] = token_hex()
+    jwt = JWTManager(app)
     
     db.init_app(app)
     
