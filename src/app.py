@@ -1,7 +1,6 @@
-from flask import Flask, jsonify
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from secrets import token_hex
@@ -19,23 +18,12 @@ def create_app():
     
     # Setup the Flask-JWT-Extended extension
     app.config['JWT_SECRET_KEY'] = token_hex()
-    jwt = JWTManager(app)
+    jwt = JWTManager()
+    jwt.init_app(app)
     
     db.init_app(app)
     
-    # Setup the login manager for the app
-    login_manager = LoginManager()
-    login_manager.init_app(app)
-    
     from models import User
-    
-    @login_manager.user_loader
-    def load_user(uid):
-        return User.query.get(uid)
-    
-    @login_manager.unauthorized_handler
-    def unauthorized_callback():
-        return jsonify({'message':'Unauthorized'}), 401
     
     # We will be using a Bcrypt object to hash the user passwords
     bcrypt = Bcrypt(app)

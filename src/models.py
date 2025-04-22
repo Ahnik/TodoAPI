@@ -1,9 +1,8 @@
-from flask_login import UserMixin
 from app import db
 from werkzeug.security import check_password_hash
 
 # The table schema for storing the user data
-class User(db.Model, UserMixin):
+class User(db.Model):
     __tablename__ = 'user'
     
     # The fields of the table 'users'
