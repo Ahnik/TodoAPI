@@ -15,7 +15,7 @@ class User(db.Model):
     def __repr__(self):
         return f'<Name: {self.name}>'
     
-    def get_uid(self):
+    def get_user_id(self):
         return self.user_id
     
     def check_password(self, password):
@@ -31,10 +31,10 @@ class Task(db.Model):
     user_task_id = db.Column(db.Integer, nullable=False)
     title = db.Column(db.String(128), nullable=False, unique=True)
     description = db.Column(db.String(512), nullable=False)
-    status = db.Column(db.String(7), nullable=False)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
     
     def __repr__(self):
-        return f'ID: {self.id}\nTitle: {self.title}\nDescription: {self.description}'
+        return f'ID: {self.user_task_id}\nTitle: {self.title}\nDescription: {self.description}'
     
     def get_task_id(self):
         return self.task_id
