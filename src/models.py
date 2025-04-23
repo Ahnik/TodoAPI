@@ -6,7 +6,7 @@ class User(db.Model):
     __tablename__ = 'user'
     
     # The fields of the table 'users'
-    uid = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(128), nullable=False, unique=True)
     name = db.Column(db.String(128), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
@@ -16,7 +16,7 @@ class User(db.Model):
         return f'<Name: {self.name}>'
     
     def get_uid(self):
-        return self.uid
+        return self.user_id
     
     def check_password(self, password):
        return check_password_hash(self.password, password)
@@ -27,10 +27,11 @@ class Task(db.Model):
     
     # The fields of the table 'task'
     task_id = db.Column(db.String(128), primary_key=True)
-    uid = db.Column(db.Integer, db.ForeignKey('user.uid'), nullable=False)
-    id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
+    user_task_id = db.Column(db.Integer, nullable=False)
     title = db.Column(db.String(128), nullable=False, unique=True)
     description = db.Column(db.String(512), nullable=False)
+    status = db.Column(db.String(7), nullable=False)
     
     def __repr__(self):
         return f'ID: {self.id}\nTitle: {self.title}\nDescription: {self.description}'

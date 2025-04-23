@@ -25,6 +25,10 @@ def create_app():
     
     from models import User
     
+    @jwt.user_identity_loader
+    def user_identity_lookup(user):
+        return user.user_id
+    
     # We will be using a Bcrypt object to hash the user passwords
     bcrypt = Bcrypt(app)
     
