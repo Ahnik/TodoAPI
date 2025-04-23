@@ -7,9 +7,32 @@ def register_routes(app, db, bcrypt):
     # Endpoint to sign up a user
     @app.route('/register', methods=['POST'], endpoint='register_user')
     def register():
-        name = request.json.get('name', None)
-        email = request.json.get('email', None)
-        password = request.json.get('password', None)
+        try:
+            name = request.json['name']
+            email = request.json['email']
+            password = request.json['password']
+        except KeyError:
+            return jsonify({'message':'Bad Request'}), 400
+        
+        errors = {}
+        
+        if not isinstance(name, str):
+            errors['name'] = 'Name must be a string'
+        elif len(name) == 0:
+            errors['name'] = 'Name must not be empty'
+        
+        if not isinstance(email, str):
+            errors['email'] = 'Email must be a string'
+        elif len(email) == 0:
+            errors['email'] = 'Email must not be empty'
+        
+        if not isinstance(password, str):
+            errors['password'] = 'Password must be a string'
+        elif len(password) == 0:
+            errors['password'] = 'Password must not be empty'
+            
+        if errors:
+            return jsonify({'errors':errors}), 400
         
         if not User.query.filter_by(email=email).one_or_none() and not User.query.filter_by(name=name).one_or_none():     
             hashed_password = bcrypt.generate_password_hash(password)   
@@ -25,8 +48,26 @@ def register_routes(app, db, bcrypt):
     # Endpoint to log in a user
     @app.route('/login', methods=['POST'], endpoint='login_user')
     def login():
-        email = request.json.get('email', None)
-        password = request.json.get('password', None)
+        try:
+            email = request.json['email']
+            password = request.json['password']
+        except KeyError:
+            return jsonify({'message':'Bad Request'}), 400
+        
+        errors = {}
+        
+        if not isinstance(email, str):
+            errors['email'] = 'Email must be a string'
+        elif len(email) == 0:
+            errors['email'] = 'Email must not be empty'
+        
+        if not isinstance(password, str):
+            errors['password'] = 'Password must be a string'
+        elif len(password) == 0:
+            errors['password'] = 'Password must not be empty'
+            
+        if errors:
+            return jsonify({'errors':errors}), 400
         
         user = User.query.filter_by(email=email).one_or_none()
         if not user or not user.check_password(password):
@@ -42,20 +83,40 @@ def register_routes(app, db, bcrypt):
         user_id = get_jwt_identity()
         # If the request is a 'POST' request, the user can add a new task 
         if request.method == 'POST':
-            title = request.json.get('title', None).strip()
-            description = request.json.get('description', None).strip()
+            try:
+                title = request.json['title']
+                description = request.json['description']
+            except KeyError:
+                return jsonify({'message':'Bad Request'}), 400
+            
+            errors = {}
+            
+            if not isinstance(title, str):
+                errors['title'] = 'Title must be a string'
+            elif len(title) == 0:
+                errors['title'] = 'Title must not be empty'
+            
+            if not isinstance(description, str):
+                errors['description'] = 'Description must be a string'
+            elif len(description) == 0:
+                errors['description'] = 'Description must not be empty'
+                
+            if errors:
+                return jsonify({'errors':errors}), 400
+            
             task = Task.query.filter_by(is_active=False, user_id=user_id).order_by(Task.user_task_id).first()
             if task:
                 task.is_active = True
                 task.title = title
                 task.description = description
+                user_task_id = task.user_task_id
                 db.session.commit()
             else:
                 last_task = Task.query.filter_by(user_id=user_id).order_by(desc(Task.user_task_id)).first()
                 user_task_id = last_task.user_task_id + 1
                 db.session.add(Task(user_id=user_id, user_task_id=user_task_id, title=title, description=description))
                 db.session.commit()
-            return jsonify({'message':'Successfully added new task'}), 201
+            return jsonify({'message':'Task {user_task_id} successfully added'}), 201
         # If the request is a 'GET' request, the API will return a JSON array as the list of all the tasks of the user
         elif request.method == 'GET':
             tasks = Task.query.filter_by(user_id=user_id).all()
