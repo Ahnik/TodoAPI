@@ -1,7 +1,8 @@
 from flask import jsonify, request
-from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
+from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity, get_jwt
 from models import User, Task
 from sqlalchemy import desc
+from app import jwt_redis_blocklist, ACCESS_EXPIRES
 
 def register_routes(app, db, bcrypt):
     # Endpoint to sign up a user
@@ -75,6 +76,14 @@ def register_routes(app, db, bcrypt):
         
         token = create_access_token(identity=user.user_id)
         return jsonify(token=token), 200
+    
+    # Endpoint to logout the current user by revoking their access token
+    @app.route('/logout', methods='DELETE')
+    @jwt_required
+    def logout():
+        jti = get_jwt()['jti']
+        jwt_redis_blocklist.set(jti, '', ex=ACCESS_EXPIRES)
+        return jsonify({'message':'Logged out successfully'}), 200
         
     # Endpoint to add a task to the Todo list or list them
     @app.route('/todos', methods=['POST', 'GET'], endpoint='add_list_tasks')
